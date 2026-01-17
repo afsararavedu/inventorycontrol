@@ -8,7 +8,7 @@ import { z } from "zod";
 // Table for the "Sales" page (matching figmascreen.png)
 export const dailySales = pgTable("daily_sales", {
   id: serial("id").primaryKey(),
-  brandNumber: text("brand_number").notNull(),
+  brandNumber: text("brand_number").notNull().unique(), // Added unique to brandNumber for upsert
   brandName: text("brand_name").notNull(),
   size: text("size").notNull(),
   quantityPerCase: integer("quantity_per_case").notNull(),
@@ -19,7 +19,7 @@ export const dailySales = pgTable("daily_sales", {
   closingBalanceCases: integer("closing_balance_cases").default(0),
   closingBalanceBottles: integer("closing_balance_bottles").default(0),
   mrp: numeric("mrp").notNull(),
-  saleValue: numeric("sale_value").default('0'),
+  totalSaleValue: numeric("total_sale_value").default('0'), // Renamed from saleValue
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -24,31 +24,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async bulkUpdateDailySales(salesData: InsertDailySale[]): Promise<DailySale[]> {
-    // For simplicity, we'll wipe and recreate, or update if ID exists.
-    // Since this is a "daily sales" sheet which might be reset or updated, 
-    // let's assume we are updating existing records or inserting new ones.
-    // For this specific use case (saving the whole table state), 
-    // we can use a transaction to upsert.
-    
-    // However, the simplest "Save Sales" implementation for a daily sheet 
-    // often implies saving the current snapshot.
-    // Let's iterate and upsert.
-    
     const results: DailySale[] = [];
     
-    // In a real app, this should be a transaction.
     for (const sale of salesData) {
-        // If we had IDs from frontend, we'd update. 
-        // But InsertDailySale omits ID. 
-        // We'll rely on brandNumber as a pseudo-key for this demo or just insert.
-        // Actually, let's clear and re-insert for this specific "snapshot" behavior
-        // if we want to represent "Current Day's Sales".
-        // But that might be destructive.
-        // Let's just insert for now to append history, or upsert if we had keys.
-        // Given the requirement is just "Save to DB", appending is safest.
-        
-        const [inserted] = await db.insert(dailySales).values(sale).returning();
-        results.push(inserted);
+      const [updated] = await db.insert(dailySales)
+        .values(sale)
+        .onConflictDoUpdate({
+          target: dailySales.brandNumber,
+          set: {
+            closingBalanceCases: sale.closingBalanceCases,
+            closingBalanceBottles: sale.closingBalanceBottles,
+            mrp: sale.mrp,
+            totalSaleValue: sale.totalSaleValue,
+            brandName: sale.brandName,
+            size: sale.size,
+            quantityPerCase: sale.quantityPerCase,
+            openingBalanceBottles: sale.openingBalanceBottles,
+            newStockCases: sale.newStockCases,
+            newStockBottles: sale.newStockBottles,
+          }
+        })
+        .returning();
+      results.push(updated);
     }
     return results;
   }
