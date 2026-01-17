@@ -93,7 +93,7 @@ async function seedDatabase() {
         closingBalanceCases: 0,
         closingBalanceBottles: 0,
         mrp: "880",
-        saleValue: "0"
+        totalSaleValue: "0"
       },
       {
         brandNumber: "3065",
@@ -106,7 +106,7 @@ async function seedDatabase() {
         closingBalanceCases: 0,
         closingBalanceBottles: 0,
         mrp: "440",
-        saleValue: "0"
+        totalSaleValue: "0"
       },
       {
         brandNumber: "3064",
@@ -119,7 +119,7 @@ async function seedDatabase() {
         closingBalanceCases: 0,
         closingBalanceBottles: 0,
         mrp: "220",
-        saleValue: "352"
+        totalSaleValue: "352"
       }
     ];
     await storage.bulkUpdateDailySales(seedData);

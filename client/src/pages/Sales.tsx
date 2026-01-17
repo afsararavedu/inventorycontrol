@@ -28,9 +28,32 @@ export default function Sales() {
   }, [sales]);
 
   const handleInputChange = (id: number, field: keyof DailySale, value: string) => {
-    const numValue = value === "" ? 0 : parseInt(value, 10);
+    const numValue = field === 'mrp' ? value : (value === "" ? 0 : parseInt(value, 10));
     setLocalSales(prev => 
-      prev.map(item => item.id === id ? { ...item, [field]: numValue } : item)
+      prev.map(item => {
+        if (item.id === id) {
+          const updatedItem = { ...item, [field]: numValue };
+          
+          // Recalculate Total Sale Value
+          // Formula: ((Op. Bal (Btls) + Qty/Case * New Stock (Cs)) + New Stock (Btls) - (Qty/Case * Closing (Cs) + Closing (Btls))) * MRP
+          const opBalBtls = updatedItem.openingBalanceBottles || 0;
+          const qtyPerCase = updatedItem.quantityPerCase || 0;
+          const newStockCs = updatedItem.newStockCases || 0;
+          const newStockBtls = updatedItem.newStockBottles || 0;
+          const closingCs = updatedItem.closingBalanceCases || 0;
+          const closingBtls = updatedItem.closingBalanceBottles || 0;
+          const mrp = parseFloat(updatedItem.mrp as string) || 0;
+
+          const calculatedTotalValue = (
+            (opBalBtls + (qtyPerCase * newStockCs)) + 
+            newStockBtls - 
+            ((qtyPerCase * closingCs) + closingBtls)
+          ) * mrp;
+
+          return { ...updatedItem, totalSaleValue: calculatedTotalValue.toString() };
+        }
+        return item;
+      })
     );
   };
 
@@ -39,7 +62,7 @@ export default function Sales() {
       onSuccess: () => {
         toast({
           title: "Sales Updated",
-          description: "Daily sales data has been successfully saved.",
+          description: "Daily sales data has been successfully updated.",
           className: "bg-green-50 border-green-200 text-green-800",
         });
       },
@@ -59,8 +82,8 @@ export default function Sales() {
   );
 
   // Calculate totals for cards
-  const totalSalesValue = localSales.reduce((acc, curr) => acc + (parseFloat(curr.saleValue || "0")), 0);
-  const closingStockValue = localSales.reduce((acc, curr) => acc + (curr.closingBalanceCases! * parseFloat(curr.mrp)), 0); // Simplified logic
+  const totalSalesValue = localSales.reduce((acc, curr) => acc + (parseFloat(curr.totalSaleValue || "0")), 0);
+  const closingStockValue = localSales.reduce((acc, curr) => acc + (curr.closingBalanceCases! * parseFloat(curr.mrp)), 0); 
 
   if (isLoading) {
     return (
@@ -142,8 +165,8 @@ export default function Sales() {
                 <th className="table-header w-32 text-right bg-green-50/50">New Stock (Btls)</th>
                 <th className="table-header w-36 text-center bg-orange-50/80 border-l border-orange-100 font-bold text-orange-900">Closing (Cs)</th>
                 <th className="table-header w-36 text-center bg-orange-50/80 font-bold text-orange-900 border-r border-orange-100">Closing (Btls)</th>
-                <th className="table-header w-28 text-right">MRP</th>
-                <th className="table-header w-32 text-right font-bold text-primary">Sale Value</th>
+                <th className="table-header w-32 text-center bg-blue-50/50 font-bold text-blue-900">MRP</th>
+                <th className="table-header w-32 text-right font-bold text-primary">Total Sale Value</th>
               </tr>
             </thead>
             <tbody>
@@ -187,9 +210,18 @@ export default function Sales() {
                         className="w-full text-center p-1.5 rounded-md border border-orange-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-bold text-foreground bg-white shadow-sm"
                       />
                     </td>
-                    <td className="table-cell text-right font-mono">₹{item.mrp}</td>
+                    <td className="p-2 border-b border-border bg-blue-50/30">
+                      <input 
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={item.mrp || 0}
+                        onChange={(e) => handleInputChange(item.id, 'mrp', e.target.value)}
+                        className="w-full text-center p-1.5 rounded-md border border-blue-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none font-bold text-foreground bg-white shadow-sm"
+                      />
+                    </td>
                     <td className="table-cell text-right font-bold text-primary font-mono">
-                      ₹{item.saleValue}
+                      ₹{item.totalSaleValue}
                     </td>
                   </tr>
                 ))
