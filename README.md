@@ -12,9 +12,12 @@ Set Up PostgreSQL:
 Install PostgreSQL locally.
 Create a database (e.g., sales_pro).
 Create a .env file in the root directory and add your connection string:
-DATABASE_URL=postgresql://username:password@localhost:5432/sales_pro
+DATABASE_URL=postgresql://postgres:waycup2020@localhost:5432/sales_pro
 Run Database Migrations:
 npm run db:push
+npm install cross-env --save-dev
+npm install dotenv
+
 Start the App:
 npm run dev
 The app will typically be available at http://localhost:5000.
