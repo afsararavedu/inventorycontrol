@@ -1,0 +1,62 @@
+# SalesPro Dashboard
+
+## Overview
+
+SalesPro is a full-stack sales management dashboard application for tracking daily sales, inventory, and orders. It features a React frontend with a modern UI built on shadcn/ui components, and an Express backend with PostgreSQL database storage using Drizzle ORM. The application provides modules for daily sales tracking, order management, file uploads, and various placeholder modules for future expansion (Stock, Reports, Credits, Calendar).
+
+## User Preferences
+
+Preferred communication style: Simple, everyday language.
+
+## System Architecture
+
+### Frontend Architecture
+- **Framework**: React 18 with TypeScript
+- **Routing**: Wouter (lightweight React router)
+- **State Management**: TanStack React Query for server state
+- **UI Components**: shadcn/ui component library with Radix UI primitives
+- **Styling**: Tailwind CSS with custom design tokens and CSS variables
+- **Build Tool**: Vite with hot module replacement
+- **Form Handling**: React Hook Form with Zod validation
+
+### Backend Architecture
+- **Framework**: Express.js with TypeScript
+- **API Pattern**: RESTful endpoints defined in shared routes file
+- **File Uploads**: Multer with memory storage
+- **Development**: tsx for TypeScript execution, Vite dev server integration
+- **Production Build**: esbuild for server bundling, Vite for client
+
+### Data Layer
+- **Database**: PostgreSQL
+- **ORM**: Drizzle ORM with drizzle-zod for schema validation
+- **Schema Location**: `shared/schema.ts` contains all table definitions
+- **Migrations**: Drizzle Kit with `db:push` command
+
+### Shared Code Structure
+- `shared/schema.ts`: Database table definitions and Zod schemas
+- `shared/routes.ts`: API route definitions with input/output schemas
+- Path aliases: `@/` for client source, `@shared/` for shared code
+
+### Key Design Patterns
+- **Type-safe API contracts**: Routes defined with Zod schemas in shared folder
+- **Upsert pattern**: Sales data uses `onConflictDoUpdate` for bulk updates
+- **Bulk operations**: Orders and sales support bulk create/update endpoints
+- **Client-side calculations**: Sales value calculations happen in browser before save
+
+## External Dependencies
+
+### Database
+- **PostgreSQL**: Primary database, connection via `DATABASE_URL` environment variable
+- **connect-pg-simple**: Session storage for PostgreSQL (available but not currently used)
+
+### Third-Party Libraries
+- **Radix UI**: Accessible UI primitives for all interactive components
+- **Lucide React**: Icon library
+- **date-fns**: Date manipulation utilities
+- **class-variance-authority**: Component variant management
+- **embla-carousel-react**: Carousel functionality
+- **recharts**: Charting library (via shadcn/ui chart component)
+
+### Development Tools
+- **Replit Vite plugins**: Runtime error overlay, cartographer, dev banner
+- **Drizzle Kit**: Database schema management and migrations

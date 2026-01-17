@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, type InsertDailySale } from "@shared/routes";
+import { api } from "@shared/routes";
+import { type InsertDailySale } from "@shared/schema";
 
 export function useSales() {
   return useQuery({

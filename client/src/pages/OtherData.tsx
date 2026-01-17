@@ -286,8 +286,8 @@ export default function OtherData() {
                       <input 
                         type="number" 
                         className="input-field text-right font-mono" 
-                        value={row.qtyCasesDelivered}
-                        onChange={(e) => handleRowChange(idx, "qtyCasesDelivered", e.target.value)}
+                        value={row.qtyCasesDelivered ?? 0}
+                        onChange={(e) => handleRowChange(idx, "qtyCasesDelivered", parseInt(e.target.value, 10) || 0)}
                       />
                     </td>
 
@@ -295,8 +295,8 @@ export default function OtherData() {
                       <input 
                         type="number" 
                         className="input-field text-right font-mono" 
-                        value={row.qtyBottlesDelivered}
-                        onChange={(e) => handleRowChange(idx, "qtyBottlesDelivered", e.target.value)}
+                        value={row.qtyBottlesDelivered ?? 0}
+                        onChange={(e) => handleRowChange(idx, "qtyBottlesDelivered", parseInt(e.target.value, 10) || 0)}
                       />
                     </td>
 
