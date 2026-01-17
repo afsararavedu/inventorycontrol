@@ -1,18 +1,65 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
+
+import { pgTable, text, serial, integer, numeric, date, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+// === TABLE DEFINITIONS ===
+
+// Table for the "Sales" page (matching figmascreen.png)
+export const dailySales = pgTable("daily_sales", {
+  id: serial("id").primaryKey(),
+  brandNumber: text("brand_number").notNull(),
+  brandName: text("brand_name").notNull(),
+  size: text("size").notNull(),
+  quantityPerCase: integer("quantity_per_case").notNull(),
+  openingBalanceBottles: integer("opening_balance_bottles").default(0),
+  newStockCases: integer("new_stock_cases").default(0),
+  newStockBottles: integer("new_stock_bottles").default(0),
+  // Editable fields
+  closingBalanceCases: integer("closing_balance_cases").default(0),
+  closingBalanceBottles: integer("closing_balance_bottles").default(0),
+  mrp: numeric("mrp").notNull(),
+  saleValue: numeric("sale_value").default('0'),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+// Table for the "Other Data" -> Order Form (matching Image 1)
+export const orders = pgTable("orders", {
+  id: serial("id").primaryKey(),
+  brandNumber: text("brand_number").notNull(),
+  brandName: text("brand_name").notNull(),
+  productType: text("product_type").notNull(), // Dropdown
+  packType: text("pack_type").notNull(), // Dropdown
+  packSize: text("pack_size").notNull(), // Dropdown "Pack Qty / Size (ml)"
+  // Editable & Calculation fields
+  qtyCasesDelivered: integer("qty_cases_delivered").default(0),
+  qtyBottlesDelivered: integer("qty_bottles_delivered").default(0),
+  ratePerCase: numeric("rate_per_case").default('0'),
+  unitRatePerBottle: numeric("unit_rate_per_bottle").default('0'),
+  totalAmount: numeric("total_amount").default('0'),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+// === SCHEMAS ===
+
+export const insertDailySaleSchema = createInsertSchema(dailySales).omit({ 
+  id: true, 
+  createdAt: true 
+});
+
+export const insertOrderSchema = createInsertSchema(orders).omit({ 
+  id: true, 
+  createdAt: true 
+});
+
+// === TYPES ===
+
+export type DailySale = typeof dailySales.$inferSelect;
+export type InsertDailySale = z.infer<typeof insertDailySaleSchema>;
+
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = z.infer<typeof insertOrderSchema>;
+
+// Request types
+export type BulkCreateDailySalesRequest = InsertDailySale[];
+export type BulkCreateOrdersRequest = InsertOrder[];
