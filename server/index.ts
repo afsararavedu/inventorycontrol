@@ -72,7 +72,13 @@ app.use((req, res, next) => {
       return next(err);
     }
 
-    return res.status(status).json({ message });
+    // Add error details in development
+    const responseBody = {
+      message,
+      ...(process.env.NODE_ENV !== "production" ? { stack: err.stack, details: err } : {}),
+    };
+
+    return res.status(status).json(responseBody);
   });
 
   // importantly only setup vite in development and after
