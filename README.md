@@ -26,6 +26,11 @@ Install PostgreSQL locally.
 Create a database (e.g., sales_pro).
 Create a .env file in the root directory and add your connection string:
 DATABASE_URL=postgresql://postgres:waycup2020@localhost:5432/sales_pro
+-------------------------
+If using AWS RDS, use the endpoint from the RDS console:
+DATABASE_URL=postgresql://admin:yourpassword@your-rds-endpoint.amazonaws.com:5432/sales_pro
+-----------------------
+
 Run Database Migrations:
 npm run db:push
 npm install cross-env --save-dev
